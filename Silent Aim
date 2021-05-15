@@ -1,0 +1,73 @@
+local ws = game:GetService("Workspace")
+local uis = game:GetService("UserInputService")
+local rs = game:GetService("ReplicatedStorage")
+local cam = ws.CurrentCamera
+local rem = rs:WaitForChild("shootingEvent")
+local plr = game:GetService("Players").LocalPlayer
+local chr
+local itm = {}
+--
+function getmatch()
+	local match = nil
+	for i,v in pairs(ws.Courts:GetChildren()) do
+		if v:FindFirstChild("_Players") then
+			local players = v["_Players"]
+			if tostring(players["B1_Player"].Value) == plr.Name then
+				match = v
+			elseif tostring(players["R1_Player"].Value) == plr.Name then
+				match = v
+			end
+		end
+	end
+	if match then	
+		return match
+	end
+end
+--
+function getpos(match)
+	local vec, vis = cam:WorldToViewportPoint(match["Backboard"].Position)
+	if vis then else
+		vec = uis:GetMouseLocation()
+	end
+	local ray = cam:ViewportPointToRay(vec.X, vec.Y)
+	return ws:FindPartOnRayWithIgnoreList(Ray.new(ray.Origin, ray.Direction * 1000), itm)
+end
+--
+function getargs()
+	local chr = plr.Character
+	local tool = chr:FindFirstChildOfClass("Tool")
+	if tool and chr and chr:FindFirstChild("Humanoid") then
+		itm = {}
+		for ind, val in pairs(chr:GetChildren()) do
+			table.insert(itm, val)
+		end
+		local match = getmatch()
+		warn(match.Name)
+		local pos
+		local hit
+		if match then
+			hit, pos = getpos(match)
+		end
+		if pos then
+			return {tool, (pos - chr.HumanoidRootPart.Position).unit, 75}
+		end
+	end
+end
+--
+function shoot()
+	if plr.Character then
+		chr = plr.Character
+		if chr:FindFirstChildOfClass("Tool") then
+			local args = getargs()
+			rem:FireServer(args[1],args[2],args[3])
+		end
+	end
+end
+--
+uis.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.Keyboard then
+		if input.KeyCode == Enum.KeyCode.Y then
+			shoot()
+		end
+	end
+end)

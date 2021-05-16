@@ -26,13 +26,43 @@ end
 --
 function getpos(match)
 	local hoop = match["Basketball Hoop"].hoop
-	local vector = hoop.Position
-	local vec, vis = cam:WorldToViewportPoint(Vector3.new(vector.X,vector.Y+(hoop.Size.Y/2)+8,vector.Z))
-	if vis then else
-		vec = uis:GetMouseLocation()
+	local startPos = plr.Character.HumanoidRootPart.Position
+	local distance = (startPos-hoop.Position).magnitude
+	local toadd = 0
+	local pow = 0
+	if distance >= 50 then
+		toadd = (distance-50)
+	else
+		toadd = 0
+		if distance > 45 then
+			pow = -5
+		elseif distance > 40 then
+			pow = -10
+		elseif distance > 35 then
+			pow = -15
+		elseif distance > 30 then
+			pow = -20
+		elseif distance > 25 then
+			pow = -25
+		elseif distance > 20 then
+			pow = -30
+		elseif distance > 15 then
+			pow = -35
+		elseif distance > 10 then
+			pow = -40
+		elseif distance > 5 then
+			pow = -45
+		end
 	end
-	local ray = cam:ViewportPointToRay(vec.X, vec.Y)
-	return ws:FindPartOnRayWithIgnoreList(Ray.new(ray.Origin, ray.Direction * 1000), itm)
+	if toadd >= 10 then
+		pow = 5
+	elseif toadd >= 12.5 then
+		pow = 10
+	end
+	local endPos = hoop.Position+Vector3.new(0,hoop.Size.Y/2+5+(toadd*3),0)
+	local ray = Ray.new(startPos, (endPos-startPos).Unit * 1000)
+	local hit, pos = ws:FindPartOnRayWithIgnoreList(ray, itm)
+	return hit, pos, pow
 end
 --
 function getargs()
@@ -47,16 +77,19 @@ function getargs()
 		if match:FindFirstChild("CanDefine") then
 			table.insert(itm,match.CanDefine)
 		end
-		if match:FindFirstChild("NotDefine") then
+		if match:FindFirstChild("NotDefine") then	
 			table.insert(itm,match.NotDefine)
 		end
 		local pos
 		local hit
+		local pow
 		if match then
-			hit, pos = getpos(match)
+			hit, pos, pow = getpos(match)
 		end
 		if pos then
-			return {tool, (pos - chr.HumanoidRootPart.Position).unit, 75}
+			local power = 75
+			if pow then power = power+pow end
+			return {tool, (pos - chr.HumanoidRootPart.Position).unit, power}
 		end
 	end
 end
@@ -73,7 +106,7 @@ end
 --
 uis.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Keyboard then
-		if input.KeyCode == Enum.KeyCode.C then
+		if input.KeyCode == Enum.KeyCode.R then
 			shoot()
 		end
 	end

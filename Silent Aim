@@ -25,7 +25,9 @@ function getmatch()
 end
 --
 function getpos(match)
-	local vec, vis = cam:WorldToViewportPoint(match["Backboard"].Position)
+	local hoop = match["Basketball Hoop"].hoop
+	local vector = hoop.Position
+	local vec, vis = cam:WorldToViewportPoint(Vector3.new(vector.X,vector.Y+(hoop.Size.Y/2)+8,vector.Z))
 	if vis then else
 		vec = uis:GetMouseLocation()
 	end
@@ -42,7 +44,12 @@ function getargs()
 			table.insert(itm, val)
 		end
 		local match = getmatch()
-		warn(match.Name)
+		if match:FindFirstChild("CanDefine") then
+			table.insert(itm,match.CanDefine)
+		end
+		if match:FindFirstChild("NotDefine") then
+			table.insert(itm,match.NotDefine)
+		end
 		local pos
 		local hit
 		if match then
@@ -66,7 +73,7 @@ end
 --
 uis.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.Keyboard then
-		if input.KeyCode == Enum.KeyCode.Y then
+		if input.KeyCode == Enum.KeyCode.C then
 			shoot()
 		end
 	end

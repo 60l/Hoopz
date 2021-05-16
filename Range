@@ -1,0 +1,45 @@
+function getmatch()
+	local match = nil
+	for i,v in pairs(game.workspace.Courts:GetChildren()) do
+		if v:FindFirstChild("_Players") then
+			local players = v["_Players"]
+			if tostring(players["B1_Player"].Value) == game.Players.LocalPlayer.Name then
+				match = v
+			elseif tostring(players["R1_Player"].Value) == game.Players.LocalPlayer.Name then
+				match = v
+			end
+		end
+	end
+	if match then	
+		return match
+	end
+end
+--
+local match = getmatch()
+if match then
+	local can = Instance.new("Part")
+	local cannot = Instance.new("Part")
+	can.Parent = match
+	can.Position = match.Backboard.Position
+	can.Size = Vector3.new(9999,100,100)
+	can.Color = Color3.fromRGB(0,255,0)
+	can.Orientation = Vector3.new(0,0,90)
+	can.Transparency = 0.8
+	can.Shape = "Cylinder"
+	can.Anchored = true
+	can.CanCollide = false
+	can.CastShadow = false
+	can.Name = "CanDefine"
+	--
+	cannot.Parent = match
+	cannot.Position = match.Backboard.Position
+	cannot.Size = Vector3.new(9999,85,85)
+	cannot.Color = Color3.fromRGB(255,0,0)
+	cannot.Orientation = Vector3.new(0,0,90)
+	cannot.Transparency = 0.5
+	cannot.Shape = "Cylinder"
+	cannot.Anchored = true
+	cannot.CanCollide = false
+	cannot.CastShadow = false
+	cannot.Name = "NotDefine"
+end
